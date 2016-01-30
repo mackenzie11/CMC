@@ -69,13 +69,40 @@ namespace VIKOR
             }
             schoolsQ = schoolsQ.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 
+            //Now we have the schools sorted by Q, we need to check validity
+            Dictionary<School, bool> check1 = new Dictionary<School, bool>();
+            Dictionary<School, bool> check2 = new Dictionary<School, bool>();
+
+            double D = 1 / (schoolsQ.Count() - 1);
+            School currSchool = schoolsQ.ElementAt(0).Key;
+            double currVal = schoolsQ.ElementAt(0).Value;
+            for (int i = 1; i < schoolsQ.Count() - 1; i++)
+            {
+                School tempSchool = schoolsQ.ElementAt(i).Key;
+                double tempVal = schoolsQ.ElementAt(i).Value;
+
+                check1[currSchool] = tempVal - currVal > D;
+
+                School bestR = schoolsR.ElementAt(0).Key;
+                School bestS = schoolsS.ElementAt(0).Key;
+                check2[currSchool] = (currSchool.Equals(bestR) | currSchool.Equals(bestS));
+
+                //Not sure about this part???
+                schoolsR.Remove(currSchool);
+                schoolsS.Remove(currSchool);
+
+                currSchool = tempSchool;
+                currVal = tempVal;                
+            }
+
+
             //Print the first 10
             for (int i = 0; i < 100; i++)
             {
                 School s = schoolsQ.ElementAt(i).Key;
                 double value = schoolsQ.ElementAt(i).Value;
 
-                Console.WriteLine(s.name + "," + value);
+                Console.WriteLine(s.name + "," + value + "," + check1[s] + "," + check2[s]);
             }
 
             Console.WriteLine(schools.Count);
