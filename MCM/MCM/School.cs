@@ -38,7 +38,12 @@ namespace VIKOR
                 double best = Program.bestCriterion[s];
                 double worst = Program.worstCriterion[s];
 
-                double total = weight * (best - paramValues[s]) / (best - worst); //Will the signs be correct?
+                double total = weight; //If the parameter is 0, that means we don't have information
+                //so, we assign the worst possible score, which results in a value of weight*1. 
+                if (paramValues[s] != 0)
+                {
+                    total = weight * (best - paramValues[s]) / (best - worst); 
+                }
 
                 temp.Add(total);
                 S += total;

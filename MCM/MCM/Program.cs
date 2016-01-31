@@ -13,10 +13,35 @@ namespace VIKOR
         //----------------------------------These are change-able constants------------------------------
         //These are the parameters we are looking at, and their weights (not sure if this is the best way to keep track).
         public static Dictionary<string, double> paramWeights = new Dictionary<string, double>(){
-            { "OPEID", 0.5 }, {"opeid6", 0.5 }
+            { "md_earn_wne_p10", 0.16667}, {"GRAD_DEBT_MDN_SUPP", 0.16667 },  { "RET_FT4", 0.08333}, {"GRRTTOT..DRVGR2010.", 0.08333 },
+            { "PCTFLOAN", 0.055556 }, {"ExpIn", 0.055556 }, {"GiftRev", 0.1111 }, {"TotalRev", 0.2222 }, {"ENDOW",0.055556 }
         };
 
+
+        //public static Dictionary<string, double> paramWeights = new Dictionary<string, double>(){
+        //    { "md_earn_wne_p10", 0.4}, {"GRAD_DEBT_MDN_SUPP", 0.3 },  { "RET_FT4", 0.15}, {"GRRTTOT..DRVGR2010.", 0.15 }
+        //};
+
+        //Maybe there's a better way to do this, but for now this just records whether a parameter
+        //is of the type min-is-best (true) or max-is-best (false). 
+        public static Dictionary<string, bool> minIsBest = new Dictionary<string, bool>()
+        {
+            { "md_earn_wne_p10", false}, {"GRAD_DEBT_MDN_SUPP", true}, { "RET_FT4", false }, {"GRRTTOT..DRVGR2010.", false },
+          { "PCTFLOAN", true }, {"ExpIn", false }, {"GiftRev", true }, {"TotalRev", true }, {"ENDOW", true }
+        };
+
+        //public static Dictionary<string, bool> minIsBest = new Dictionary<string, bool>()
+        //{
+        //    { "md_earn_wne_p10", false}, {"GRAD_DEBT_MDN_SUPP", true}, { "RET_FT4", false }, {"GRRTTOT..DRVGR2010.", false },
+        //};
+
+
         public static double v = 0.5; //This is the weight strategy
+
+        public static Dictionary<string, int> eliminate = new Dictionary<string, int>()
+        {
+            {"HCM2", 1}
+        };
 
         //-------------------------------------------------------------------------------------------------
 
@@ -97,13 +122,27 @@ namespace VIKOR
 
 
             //Print the first 10
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 200; i++)
             {
                 School s = schoolsQ.ElementAt(i).Key;
                 double value = schoolsQ.ElementAt(i).Value;
 
                 Console.WriteLine(s.name + "," + value + "," + check1[s] + "," + check2[s]);
             }
+
+
+
+
+            //before your loop
+            var csv = new StringBuilder();
+            csv.AppendLine("UNITID,Rating");
+            foreach (School s in schoolsQ.Keys)
+            {
+                csv.AppendLine(s.name + "," + schoolsQ[s]);
+            }
+
+            //after your loop
+            File.WriteAllText(@"...\...\rankingNew.csv", csv.ToString());
 
             Console.WriteLine(schools.Count);
             Console.ReadLine();
@@ -122,7 +161,7 @@ namespace VIKOR
             parameters = new Dictionary<string, int>();
             schools = new Dictionary<string, School>();
 
-            var reader = new StreamReader(File.OpenRead(@"...\...\test.csv"));
+            var reader = new StreamReader(File.OpenRead(@"...\...\Everything.csv"));
 
             //First, get the positions of the columns we want
             var line = reader.ReadLine();
@@ -135,6 +174,8 @@ namespace VIKOR
                     parameters.Add(currentVal, i);
                     paramsWeWant.Remove(currentVal);
                 }
+
+              //  if (eliminate.Keys.Contains(currentVal))
             }
 
 
@@ -153,9 +194,9 @@ namespace VIKOR
                 }
 
 
-                string schoolId = values[0]; //Not sure if this will always be four?
+                string schoolId = values[1]; //Not sure if this will always be four?
                 School school = new School(schoolId, paramValues);
-                school.name =values[3];
+                school.name =values[7];
                 schools.Add(schoolId, school);
             }
 
@@ -184,8 +225,17 @@ namespace VIKOR
 
                 //Sort the list, Note: not sure if lowest is first, or what? Need to check!!!
                 temp.Sort();
-                bestCriterion.Add(s, temp.First());
-                worstCriterion.Add(s, temp.Last());
+
+                if (minIsBest[s])
+                {
+                    bestCriterion.Add(s, temp.First());
+                    worstCriterion.Add(s, temp.Last());
+                }
+                else
+                {
+                    bestCriterion.Add(s, temp.Last());
+                    worstCriterion.Add(s, temp.First());
+                }
             }
 
 

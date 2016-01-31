@@ -49,6 +49,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="CombinedData.csv" />
+    <None Include="edittedData.csv" />
+    <None Include="Everything.csv" />
+    <None Include="ranking.csv" />
+    <None Include="ranking2.csv" />
+    <None Include="rankingNew.csv" />
+    <None Include="rating.csv" />
+    <None Include="ratingNew.csv" />
     <None Include="test.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
